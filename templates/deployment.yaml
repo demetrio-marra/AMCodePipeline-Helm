@@ -17,6 +17,8 @@ spec:
     spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
       containers:
         - name: am-code-pipeline
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "am-code-pipeline.fullname" . }}
+  labels:
+    {{- include "am-code-pipeline.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "am-code-pipeline.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        {{- include "am-code-pipeline.labels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: am-code-pipeline
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: {{ .Values.environment | quote }}
+            - name: ApiAuth__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "am-code-pipeline.fullname" . }}
+                  key: api-auth-api-key
+            - name: InferenceProviders__HuggingFace__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "am-code-pipeline.fullname" . }}
+                  key: huggingface-api-key
+            - name: InferenceProviders__Together__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "am-code-pipeline.fullname" . }}
+                  key: together-api-key
+            - name: InferenceProviders__FireworksAI__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "am-code-pipeline.fullname" . }}
+                  key: fireworks-ai-api-key
+            - name: InferenceProviders__OpenAI__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "am-code-pipeline.fullname" . }}
+                  key: openai-api-key
+            - name: LightRagService__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "am-code-pipeline.fullname" . }}
+                  key: lightrag-api-key
+            - name: CohereV1RerankerService__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "am-code-pipeline.fullname" . }}
+                  key: cohere-v1-reranker-api-key
+          volumeMounts:
+            - name: appsettings
+              mountPath: /app/appsettings.json
+              subPath: appsettings.json
+              readOnly: true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: appsettings
+          configMap:
+            name: {{ include "am-code-pipeline.fullname" . }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}

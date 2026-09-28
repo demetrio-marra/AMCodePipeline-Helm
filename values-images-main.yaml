@@ -1,0 +1,3 @@
+environment: 'Production'
+image:
+  tag: '8b2ee2ff.44'

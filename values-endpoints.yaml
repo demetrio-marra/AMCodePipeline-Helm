@@ -1,0 +1,22 @@
+config:
+  SESJSSandbox:
+    SandboxServiceURL: https://jscodesandbox.dem-k8s.home
+  InferenceProviders:
+    HuggingFace:
+      Endpoint: https://router.huggingface.co/v1
+    Together:
+      Endpoint: https://api.together.xyz/v1/
+    FireworksAI:
+      Endpoint: https://api.fireworks.ai/inference/v1/
+    OpenAI:
+      Endpoint: https://api.openai.com/v1
+  AgentMemoryService:
+    BaseUrl: https://mem0.dem-k8s.home
+    TimeoutSeconds: 90
+  LightRagService:
+    BaseUrl: https://lightrag.dem-k8s.home
+    MaxTopK: 50
+  CohereV1RerankerService:
+    BaseUrl: https://api.fireworks.ai/inference/
+    Model: accounts/fireworks/models/qwen3-reranker-8b
+    TimeoutSeconds: 30

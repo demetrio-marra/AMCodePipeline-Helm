@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "am-code-pipeline.fullname" . }}
+  labels:
+    {{- include "am-code-pipeline.labels" . | nindent 4 }}
+data:
+  appsettings.json: {{ .Values.config | toJson | quote }}
